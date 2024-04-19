@@ -3,7 +3,6 @@
 	This problem requires you to implement a basic interface for a binary tree
 */
 
-//I AM NOT DONE
 use std::cmp::Ordering;
 use std::fmt::Debug;
 
@@ -51,12 +50,35 @@ where
     // Insert a value into the BST
     fn insert(&mut self, value: T) {
         //TODO
+        match self.root {
+            Some(ref mut node) => node.insert(value),
+            None => self.root = Some(Box::new(TreeNode::new(value))),
+        }
     }
 
     // Search for a value in the BST
     fn search(&self, value: T) -> bool {
         //TODO
-        true
+        // Deep First Search
+        if self.root.is_some() {
+            let mut stack: Vec<&Box<TreeNode<T>>> = Vec::new();
+            let mut root = &self.root;
+
+            while root.is_some() || !stack.is_empty() {
+                if root.is_some() {
+                    let node = root.as_ref().unwrap();
+                    if node.value == value {
+                        return true;
+                    }
+                    stack.push(node);
+                    root = &node.left;
+                } else {
+                    let node = stack.pop().unwrap();
+                    root = &node.right;
+                }
+            }
+        }
+        false
     }
 }
 
@@ -67,6 +89,38 @@ where
     // Insert a node into the tree
     fn insert(&mut self, value: T) {
         //TODO
+
+        let mut root = match self.value.cmp(&value) {
+            Ordering::Greater => &mut self.left,
+            Ordering::Less => &mut self.right,
+            _ => return,
+        };
+
+        loop {
+            match root {
+                Some(n) => {
+                    if n.value > value {
+                        root = &mut n.left;
+                    } else {
+                        root = &mut n.right;
+                    }
+                }
+                None => {
+                    break;
+                }
+            }
+        }
+
+        if let Some(n) = root {
+            unreachable!();
+            match value.cmp(&n.value) {
+                Ordering::Less => n.left = Some(Box::new(TreeNode::new(value))),
+                Ordering::Greater => n.right = Some(Box::new(TreeNode::new(value))),
+                _ => {},
+            }
+        } else {
+            *root = Some(Box::new(TreeNode::new(value)));
+        }
     }
 }
 

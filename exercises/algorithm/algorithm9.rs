@@ -2,7 +2,6 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -38,6 +37,28 @@ where
 
     pub fn add(&mut self, value: T) {
         //TODO
+        // Shift-up
+        self.items.push(value);
+        self.count += 1;
+        let mut idx = self.len();
+        while idx != 0 {
+            let parent = self.parent_idx(idx);
+            if parent == 0 {
+                break;
+            }
+            if (self.comparator)(&self.items[idx], &self.items[parent]) {
+                self.items.swap(idx, parent);
+                idx = parent;
+            } else {
+                if self.children_present(parent) {
+                    let child = self.left_child_idx(parent);
+                    if (self.comparator)(&self.items[idx], &self.items[child]) {
+                        self.items.swap(idx, child);
+                    }
+                }
+                break;
+            }
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -58,7 +79,7 @@ where
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
         //TODO
-		0
+        self.left_child_idx(idx)
     }
 }
 
@@ -85,7 +106,26 @@ where
 
     fn next(&mut self) -> Option<T> {
         //TODO
-		None
+        // Shift-down
+        if self.len() == 0 {
+            return None;
+        }
+
+        let item = self.items.swap_remove(1);
+        self.count -= 1;
+        let mut parent = 1;
+
+        while self.children_present(parent) {
+            let idx = self.smallest_child_idx(parent);
+            if (self.comparator)(&self.items[idx], &self.items[parent]) {
+                self.items.swap(idx, parent);
+                parent = idx;
+            } else {
+                break;
+            }
+        }
+
+        Some(item)
     }
 }
 
